@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 
-function Register() {
+function Login() {
   const [submitted, setSubmitted] = useState(false);
   const {
     register,
@@ -57,7 +57,7 @@ function Register() {
             <span className="text-[#c8ff00] font-mono text-[10px] border border-[#c8ff00] rounded-full w-4 h-4 flex items-center justify-center font-bold">R</span>
           </div>
           <h1 className="font-serif text-3xl md:text-4xl text-white tracking-tight mb-2">
-            Create your <span className="italic text-[#c8ff00]">vault</span>
+            Login your <span className="italic text-[#c8ff00]">vault</span>
           </h1>
           <p className="text-[#8a8a8a] text-sm font-mono">
             Takes about a minute. No credit card.
@@ -65,38 +65,6 @@ function Register() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-          <div>
-            <label className="block text-xs font-mono text-[#8a8a8a] mb-1.5 tracking-wider uppercase">
-              Full name
-            </label>
-            <input
-              type="text"
-              placeholder="Jane Doe"
-              {...register('name', {
-                required: "We'll need your name",
-                minLength: { value: 2, message: 'A bit longer please' },
-              })}
-              className={`w-full px-4 py-2.5 bg-[#0a0a0a] border text-sm text-white placeholder-[#555] outline-none transition-all duration-200 focus:ring-1 font-mono ${
-                errors.name
-                  ? 'border-red-500/50 focus:ring-red-500/30'
-                  : 'border-[#2a2a2a] focus:border-[#c8ff00] focus:ring-[#c8ff00]/20'
-              }`}
-            />
-            <AnimatePresence>
-              {errors.name && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.15 }}
-                  className="text-red-400 text-xs mt-1.5 font-mono"
-                >
-                  {errors.name.message}
-                </motion.p>
-              )}
-            </AnimatePresence>
-          </div>
-
           <div>
             <label className="block text-xs font-mono text-[#8a8a8a] mb-1.5 tracking-wider uppercase">
               Email
@@ -132,45 +100,9 @@ function Register() {
             </AnimatePresence>
           </div>
 
-          <div className='flex gap-5'>
-            <div>
-            <label className="block text-xs font-mono text-[#8a8a8a] mb-1.5 tracking-wider uppercase">
-              Master password
-            </label>
-            <input
-              type="password"
-              placeholder="At least 8 characters"
-              {...register('password', {
-                required: 'Gotta have a password',
-                minLength: {
-                  value: 8,
-                  message: 'Make it at least 8 chars',
-                },
-              })}
-              className={`w-full px-4 py-2.5 bg-[#0a0a0a] border text-sm text-white placeholder-[#555] outline-none transition-all duration-200 focus:ring-1 font-mono ${
-                errors.password
-                  ? 'border-red-500/50 focus:ring-red-500/30'
-                  : 'border-[#2a2a2a] focus:border-[#c8ff00] focus:ring-[#c8ff00]/20'
-              }`}
-            />
-            <AnimatePresence>
-              {errors.password && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.15 }}
-                  className="text-red-400 text-xs mt-1.5 font-mono"
-                >
-                  {errors.password.message}
-                </motion.p>
-              )}
-            </AnimatePresence>
-          </div>
-
           <div>
             <label className="block text-xs font-mono text-[#8a8a8a] mb-1.5 tracking-wider uppercase">
-              Confirm password
+            Password
             </label>
             <input
               type="password"
@@ -199,7 +131,6 @@ function Register() {
                 </motion.p>
               )}
             </AnimatePresence>
-          </div>
           </div>
 
           <div className="flex items-start gap-2.5 pt-2">
@@ -244,11 +175,11 @@ function Register() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Creating vault...
+                login vault...
               </>
             ) : (
               <>
-                Create vault
+                Login
                 <span>→</span>
               </>
             )}
@@ -256,9 +187,9 @@ function Register() {
         </form>
 
         <p className="text-center text-xs text-[#8a8a8a] mt-8 font-mono">
-          Already have a vault?{' '}
-          <a href="/login" className="text-[#c8ff00] hover:underline">
-            Login
+          Don't have a vault?{' '}
+          <a href="/register" className="text-[#c8ff00] hover:underline">
+            Register
           </a>
         </p>
       </motion.div>
@@ -266,4 +197,4 @@ function Register() {
   );
 }
 
-export default Register
+export default Login

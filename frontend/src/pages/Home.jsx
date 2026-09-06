@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, useInView, useScroll, useTransform } from "framer-motion";
+import Footer from "./Footer";
+import Manifesto from "../components/Manifesto"
 
 /* ================================================================
    Home.jsx — Credentials · Password Manager
@@ -50,19 +52,6 @@ function Grain() {
           "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
       }}
     />
-  );
-}
-
-/* ---------------- Marquee ---------------- */
-
-function Marquee({ children, duration = 24, className = "" }) {
-  return (
-    <div className={`overflow-hidden whitespace-nowrap ${className}`}>
-      <div className="marquee-track inline-flex items-center" style={{ animationDuration: `${duration}s` }}>
-        {children}
-        {children}
-      </div>
-    </div>
   );
 }
 
@@ -585,7 +574,7 @@ function Nav() {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-            <a href="#" className="mono text-[11px] tracking-[0.18em] transition-colors hover:text-[#D6FF3F]" style={{ color: PALETTE.ink }}>
+            <a href="/register" className="mono text-[11px] tracking-[0.18em] transition-colors hover:text-[#D6FF3F]" style={{ color: PALETTE.ink }}>
               SIGN IN
             </a>
             <motion.a
@@ -783,148 +772,6 @@ function Hero() {
   );
 }
 
-/* ---------------- Manifesto / CTA ---------------- */
-
-function Manifesto() {
-  const underlineRef = useRef(null);
-  const underlineInView = useInView(underlineRef, { once: true, margin: "-80px" });
-
-  return (
-    <section id="manifesto" className="border-t relative overflow-hidden" style={{ borderColor: PALETTE.line }}>
-      <div className="max-w-5xl mx-auto px-5 sm:px-8 py-20 sm:py-32 text-center">
-        <p className="mono text-xs tracking-[0.22em] mb-8" style={{ color: PALETTE.mut }}>
-          SEC. 03 / MANIFESTO
-        </p>
-        <motion.h2
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="font-display text-4xl sm:text-6xl lg:text-7xl leading-[1.04] tracking-tight"
-          style={{ color: PALETTE.ink }}
-        >
-          The best password
-          <br />
-          is the one you{" "}
-          <span className="relative inline-block italic">
-            never type.
-            <svg ref={underlineRef} className="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 12" fill="none" preserveAspectRatio="none">
-              <motion.path
-                d="M4 8 C 60 2, 150 12, 296 5"
-                stroke={PALETTE.lime}
-                strokeWidth="3"
-                strokeLinecap="round"
-                initial={{ pathLength: 0 }}
-                animate={underlineInView ? { pathLength: 1 } : {}}
-                transition={{ duration: 0.9, delay: 0.4, ease: "easeOut" }}
-              />
-            </svg>
-          </span>
-        </motion.h2>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3, duration: 0.7 }}
-          className="mt-8 max-w-xl mx-auto text-sm sm:text-base leading-relaxed"
-          style={{ color: PALETTE.mut }}
-        >
-          Join 2.4 million people who stopped recycling “Password123!” across the internet.
-          Free for personal vaults. No credit card. No tricks.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.45, duration: 0.7 }}
-          className="mt-10 flex flex-col sm:flex-row gap-3 justify-center"
-        >
-          <motion.a
-            href="#"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="mono text-xs tracking-[0.2em] px-9 py-4 rounded-sm"
-            style={{ background: PALETTE.lime, color: "#0B0B0C" }}
-          >
-            CREATE MY VAULT — FREE
-          </motion.a>
-          <motion.a
-            href="#"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="mono text-xs tracking-[0.2em] px-9 py-4 rounded-sm border transition-colors"
-            style={{ borderColor: PALETTE.line, color: PALETTE.ink }}
-          >
-            TALK TO SECURITY TEAM
-          </motion.a>
-        </motion.div>
-      </div>
-
-      {/* big serif marquee */}
-      <div className="border-t py-6" style={{ borderColor: PALETTE.line }}>
-        <Marquee duration={30}>
-          {[0, 1, 2].map((k) => (
-            <span key={k} className="font-display text-3xl sm:text-5xl mx-6" style={{ color: PALETTE.ink }}>
-              remember nothing <span className="italic" style={{ color: PALETTE.lime }}>·</span> trust the vault{" "}
-              <span className="italic" style={{ color: PALETTE.lime }}>·</span> own your keys{" "}
-              <span className="italic" style={{ color: PALETTE.lime }}>·</span>
-            </span>
-          ))}
-        </Marquee>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- Footer ---------------- */
-
-function Footer() {
-  const cols = [
-    { head: "PRODUCT", items: ["Vaults", "Forge", "Breach radar", "Passkeys", "Pricing"] },
-    { head: "COMPANY", items: ["About", "Journal", "Careers", "Press kit"] },
-    { head: "RESOURCES", items: ["Docs", "Security model", "Whitepaper", "Status"] },
-    { head: "LEGAL", items: ["Privacy", "Terms", "GDPR", "Bug bounty"] },
-  ];
-
-  return (
-    <footer className="border-t" style={{ borderColor: PALETTE.line }}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-14 sm:mb-20">
-          {cols.map((col) => (
-            <div key={col.head}>
-              <p className="mono text-[10px] tracking-[0.22em] mb-4" style={{ color: PALETTE.mut }}>{col.head}</p>
-              <ul className="space-y-2.5">
-                {col.items.map((it) => (
-                  <li key={it}>
-                    <a href="#" className="text-sm transition-colors hover:text-[#D6FF3F]" style={{ color: PALETTE.ink }}>
-                      {it}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-12 mono text-[10px] tracking-[0.16em]" style={{ color: PALETTE.mut }}>
-          <span>© {new Date().getFullYear()} Credentials SECURITY GMBH</span>
-          <span>AES-256 · ARGON2ID · SOC 2 TYPE II · AUDITED ANNUALLY</span>
-        </div>
-
-        <div className="overflow-hidden select-none" aria-hidden>
-          <p
-            className="font-display text-[18vw] leading-[0.85] text-center transition-colors duration-500 hover:text-[#D6FF3F]"
-            style={{ color: "transparent", WebkitTextStroke: `1px ${PALETTE.line}` }}
-          >
-            Credentials
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 /* ---------------- Root ---------------- */
 
@@ -933,7 +780,7 @@ export default function Home() {
   const { scrollYProgress } = useScroll();
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ background: PALETTE.bg, color: PALETTE.ink, fontFamily: "'Archivo', system-ui, sans-serif" }}>
+    <div className="min-h-screen overflow-x-hidden select-none" style={{ background: PALETTE.bg, color: PALETTE.ink, fontFamily: "'Archivo', system-ui, sans-serif" }}>
       <style>{`
         .font-display { font-family: 'Instrument Serif', Georgia, serif; }
         .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
