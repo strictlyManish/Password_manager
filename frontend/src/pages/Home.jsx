@@ -731,7 +731,7 @@ function Hero() {
               className="mt-9 flex flex-col sm:flex-row gap-3"
             >
               <motion.a
-                href="#manifesto"
+                href="/register"
                 whileHover={{ x: 3 }}
                 whileTap={{ scale: 0.98 }}
                 className="mono text-xs tracking-[0.2em] px-7 py-4 rounded-sm text-center"
