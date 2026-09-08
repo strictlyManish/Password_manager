@@ -17,9 +17,9 @@ const cookieOptions = {
 // =========================
 const user_register_controller = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
+    const { fullname, email, password } = req.body;
+      
+    if (!fullname || !email || !password) {
       return res.status(400).json({
         success: false,
         message: "Name, email and password are required",
@@ -49,7 +49,7 @@ const user_register_controller = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 12);
 
     const user = await User.create({
-      name: name.trim(),
+      fullname: fullname.trim(),
       email: normalizedEmail,
       passwordHash,
     });
@@ -61,7 +61,7 @@ const user_register_controller = async (req, res) => {
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
-      }
+      },
     );
 
     res.cookie(COOKIE_NAME, token, cookieOptions);
@@ -71,7 +71,7 @@ const user_register_controller = async (req, res) => {
       message: "Registration successful",
       user: {
         id: user._id,
-        name: user.name,
+        name: user.fullname,
         email: user.email,
         isEmailVerified: user.isEmailVerified,
       },
@@ -113,10 +113,7 @@ const user_login_controller = async (req, res) => {
       });
     }
 
-    const isPasswordCorrect = await bcrypt.compare(
-      password,
-      user.passwordHash
-    );
+    const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
 
     if (!isPasswordCorrect) {
       return res.status(401).json({
@@ -132,7 +129,7 @@ const user_login_controller = async (req, res) => {
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
-      }
+      },
     );
 
     res.cookie(COOKIE_NAME, token, cookieOptions);
@@ -183,8 +180,27 @@ const user_logout_controller = async (req, res) => {
   }
 };
 
+const getMe_controller = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized, user not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: req.user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   user_login_controller,
   user_register_controller,
-  user_logout_controller
+  user_logout_controller,
+  getMe_controller,
 };

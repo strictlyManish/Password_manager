@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from "./Footer";
-
+import { useDispatch } from "react-redux";
+import { logoutUser } from '../app/features/authSlice';
 // Mock data for the dashboard
 const MOCK_VAULT_ITEMS = [
   { id: 1, name: 'GitHub', username: 'kai_dev', url: 'github.com', category: 'Development', lastUsed: '2 hours ago' },
@@ -15,6 +16,7 @@ function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [copiedId, setCopiedId] = useState(null);
+  const dispatch = useDispatch();
 
   const categories = ['All', 'Development', 'Cloud', 'Finance', 'Productivity'];
 
@@ -56,6 +58,9 @@ function Dashboard() {
             />
             <button className="bg-[#c8ff00] hover:bg-[#d4ff33] text-[#0a0a0a] text-xs font-mono tracking-[0.1em] uppercase px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2">
               <span>+</span> New Entry
+            </button>
+            <button onClick={()=>dispatch(logoutUser())} className="bg-[#ff3c00ad] hover:bg-[#d4ff33] text-[#0a0a0a] text-xs font-mono tracking-[0.1em] uppercase px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2">
+              logout
             </button>
           </div>
         </div>
