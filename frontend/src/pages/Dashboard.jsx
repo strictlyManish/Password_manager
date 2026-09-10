@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Footer from "./Footer";
 import { useDispatch } from "react-redux";
 import { logoutUser } from '../app/features/authSlice';
+import { useNavigate } from "react-router-dom";
 // Mock data for the dashboard
 const MOCK_VAULT_ITEMS = [
   { id: 1, name: 'GitHub', username: 'kai_dev', url: 'github.com', category: 'Development', lastUsed: '2 hours ago' },
@@ -17,7 +18,7 @@ function Dashboard() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [copiedId, setCopiedId] = useState(null);
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const categories = ['All', 'Development', 'Cloud', 'Finance', 'Productivity'];
 
   const filteredItems = MOCK_VAULT_ITEMS.filter(item => {
@@ -31,6 +32,11 @@ function Dashboard() {
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
+  const handleLogout_user = ()=>{
+    dispatch(logoutUser());
+    navigate("/")
+    
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col relative overflow-hidden">
@@ -59,7 +65,7 @@ function Dashboard() {
             <button className="bg-[#c8ff00] hover:bg-[#d4ff33] text-[#0a0a0a] text-xs font-mono tracking-[0.1em] uppercase px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2">
               <span>+</span> New Entry
             </button>
-            <button onClick={()=>dispatch(logoutUser())} className="bg-[#ff3c00ad] hover:bg-[#d4ff33] text-[#0a0a0a] text-xs font-mono tracking-[0.1em] uppercase px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2">
+            <button onClick={()=>handleLogout_user()} className="bg-[#ff3c00ad] hover:bg-[#d4ff33] text-[#0a0a0a] text-xs font-mono tracking-[0.1em] uppercase px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2">
               logout
             </button>
           </div>

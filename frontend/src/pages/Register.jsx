@@ -44,6 +44,7 @@ function Register() {
           result.payload || "register failed. Please check your credentials.",
       });
     }
+    navigate("/login")
   };
 
   if (submitted) {
