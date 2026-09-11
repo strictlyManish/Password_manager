@@ -1,24 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api/axios';
 
-// Async thunk for login
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      console.log(credentials)
       const response = await api.post('/auth/login', credentials);
-      
-      const { token, user } = response.data;
-
-      if (token) {
-        localStorage.setItem('token', token);
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      }
-      if (user) {
-        localStorage.setItem('user', JSON.stringify(user));
-      }
-
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -28,27 +15,15 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// Async thunk for register
 export const registerUser = createAsyncThunk(
   'auth/register',
   async (userData, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/register', {
-        fullname:userData.fullname,
-        email:userData.email,
-        password:userData.password
+        fullname: userData.fullname,
+        email: userData.email,
+        password: userData.password
       });
-      
-      const { token, user } = response.data;
-
-      if (token) {
-        localStorage.setItem('token', token);
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      }
-      if (user) {
-        localStorage.setItem('user', JSON.stringify(user));
-      }
-
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -58,23 +33,13 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// Async thunk for logout
 export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
       await api.get('/auth/logout');
-      
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      delete api.defaults.headers.common['Authorization'];
-
       return true;
     } catch (error) {
-      // Even if backend fails, clear local state
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      delete api.defaults.headers.common['Authorization'];
       return rejectWithValue(
         error.response?.data?.message || 'Logout failed'
       );
@@ -82,26 +47,13 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
-// Async thunk to check if user is authenticated
-export const checkAuth = createAsyncThunk(
-  'auth/checkAuth',
+export const getMe = createAsyncThunk(
+  'auth/getMe',
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        return rejectWithValue('No token found');
-      }
-
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
       const response = await api.get('/auth/me');
-
       return response.data;
     } catch (error) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      delete api.defaults.headers.common['Authorization'];
       return rejectWithValue(
         error.response?.data?.message || 'Authentication failed'
       );
@@ -109,18 +61,10 @@ export const checkAuth = createAsyncThunk(
   }
 );
 
-// Set default auth header on load if token exists
-const token = localStorage.getItem('token');
-if (token) {
-  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-}
-
 const initialState = {
-  user: localStorage.getItem('user') 
-    ? JSON.parse(localStorage.getItem('user')) 
-    : null,
-  token: token || null,
-  isAuthenticated: !!token,
+  user: null,
+  token: null,
+  isAuthenticated: false,
   status: 'idle',
   error: null,
   loading: false,
@@ -141,9 +85,6 @@ const authSlice = createSlice({
       state.status = 'idle';
       state.error = null;
       state.loading = false;
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      delete api.defaults.headers.common['Authorization'];
     },
   },
   extraReducers: (builder) => {
@@ -158,7 +99,6 @@ const authSlice = createSlice({
         state.status = 'succeeded';
         state.loading = false;
         state.user = action.payload.user;
-        state.token = action.payload.token;
         state.isAuthenticated = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -176,7 +116,6 @@ const authSlice = createSlice({
         state.status = 'succeeded';
         state.loading = false;
         state.user = action.payload.user;
-        state.token = action.payload.token;
         state.isAuthenticated = true;
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -199,21 +138,19 @@ const authSlice = createSlice({
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        // Still clear local state even if backend failed
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
       })
-      // Check auth cases
-      .addCase(checkAuth.pending, (state) => {
+      .addCase(getMe.pending, (state) => {
         state.loading = true;
       })
-      .addCase(checkAuth.fulfilled, (state, action) => {
+      .addCase(getMe.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
         state.isAuthenticated = true;
       })
-      .addCase(checkAuth.rejected, (state) => {
+      .addCase(getMe.rejected, (state) => {
         state.loading = false;
         state.user = null;
         state.token = null;
@@ -223,5 +160,4 @@ const authSlice = createSlice({
 });
 
 export const { clearError, resetAuth } = authSlice.actions;
-
 export default authSlice.reducer;
