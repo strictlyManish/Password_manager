@@ -1,17 +1,15 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/", // Ensure this matches your backend URL precisely
+  baseURL: "http://localhost:3000/",
   headers: {
     "Content-Type": "application/json",
-    
   },
-  withCredentials:true
+  withCredentials: true,
 });
 
 api.interceptors.request.use(
   (config) => {
-    // Dynamically grab the token on EVERY request
     const token = localStorage.getItem("token");
 
     if (token) {
@@ -21,6 +19,17 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
     return Promise.reject(error);
   }
 );

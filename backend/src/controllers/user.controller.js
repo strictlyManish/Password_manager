@@ -71,7 +71,7 @@ const user_register_controller = async (req, res) => {
       message: "Registration successful",
       user: {
         id: user._id,
-        name: user.fullname,
+        fullname: user.fullname,
         email: user.email,
         isEmailVerified: user.isEmailVerified,
       },
@@ -139,7 +139,7 @@ const user_login_controller = async (req, res) => {
       message: "Login successful",
       user: {
         id: user._id,
-        name: user.name,
+        fullname: user.fullname,
         email: user.email,
         isEmailVerified: user.isEmailVerified,
       },
@@ -189,12 +189,16 @@ const getMe_controller = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      data: req.user,
+      user: req.user,
     });
   } catch (error) {
-    next(error);
+    console.error("getMe error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 

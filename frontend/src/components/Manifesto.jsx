@@ -1,23 +1,16 @@
-import { useInView, motion } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import Marquee from "./Marquee";
 
+const PALETTE = {
+  bg: "#0B0B0C",
+  ink: "#E9E6DD",
+  lime: "#D6FF3F",
+  coral: "#FF6B4A",
+  mut: "#8B8C86",
+  line: "rgba(233,230,221,0.14)",
+};
+
 function Manifesto() {
-  const underlineRef = useRef(null);
-  const underlineInView = useInView(underlineRef, {
-    once: true,
-    margin: "-80px",
-  });
-
-  const PALETTE = {
-    bg: "#0B0B0C",
-    ink: "#E9E6DD",
-    lime: "#D6FF3F",
-    coral: "#FF6B4A",
-    mut: "#8B8C86",
-    line: "rgba(233,230,221,0.14)",
-  };
-
   return (
     <section
       id="manifesto"
@@ -45,8 +38,7 @@ function Manifesto() {
           <span className="relative inline-block italic">
             never type.
             <svg
-              ref={underlineRef}
-              className="absolute -bottom-2 left-0 w-full"
+              className="absolute -bottom-2 left-0 w-full overflow-visible pointer-events-none"
               viewBox="0 0 300 12"
               fill="none"
               preserveAspectRatio="none"
@@ -57,7 +49,8 @@ function Manifesto() {
                 strokeWidth="3"
                 strokeLinecap="round"
                 initial={{ pathLength: 0 }}
-                animate={underlineInView ? { pathLength: 1 } : {}}
+                whileInView={{ pathLength: 1 }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.9, delay: 0.4, ease: "easeOut" }}
               />
             </svg>
@@ -104,7 +97,6 @@ function Manifesto() {
         </motion.div>
       </div>
 
-      {/* big serif marquee */}
       <div className="border-t py-6" style={{ borderColor: PALETTE.line }}>
         <Marquee duration={30}>
           {[0, 1, 2].map((k) => (
