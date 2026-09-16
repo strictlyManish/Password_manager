@@ -1,4 +1,17 @@
+@import url("https://cdn.jsdelivr.net/fontsource/fonts/instrument-serif@latest/latin-400-normal.css");
+@import url("https://cdn.jsdelivr.net/fontsource/fonts/instrument-serif@latest/latin-400-italic.css");
+@import url("https://cdn.jsdelivr.net/fontsource/fonts/ibm-plex-mono@latest/latin-400-normal.css");
+@import url("https://cdn.jsdelivr.net/fontsource/fonts/ibm-plex-mono@latest/latin-500-normal.css");
+@import url("https://cdn.jsdelivr.net/fontsource/fonts/archivo@latest/latin-400-normal.css");
+@import url("https://cdn.jsdelivr.net/fontsource/fonts/archivo@latest/latin-500-normal.css");
+@import url("https://cdn.jsdelivr.net/fontsource/fonts/archivo@latest/latin-700-normal.css");
 @import "tailwindcss";
+
+@theme {
+  --font-display: "Instrument Serif", serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  --font-sans: "Archivo", sans-serif;
+}
 
 
 
@@ -7,6 +20,11 @@ html,body{
     scrollbar-width: none;
     background-color: rgb(21, 21, 21);
     color: white;
+  font-family: "Archivo", sans-serif;
+}
+
+.mono {
+  font-family: "IBM Plex Mono", monospace;
 }
 
 @keyframes marquee {

@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { PALETTE } from "../constants/theme";
 import { useTypedSession } from "../hooks/useTypedSession";

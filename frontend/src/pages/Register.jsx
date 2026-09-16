@@ -43,7 +43,9 @@ function Register() {
         message:
           result.payload || "register failed. Please check your credentials.",
       });
+      return;
     }
+
     navigate("/login")
   };
 

@@ -1,18 +1,11 @@
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function VaultCard({ item, isCopied, onCopy, onEdit, onDelete }) {
-  // MongoDB uses _id, so fallback to item.id if _id isn't present
   const itemId = item._id || item.id;
 
   const handleCopy = (e) => {
     e.stopPropagation();
     if (onCopy) onCopy(itemId);
-  };
-
-  const handleEdit = (e) => {
-    e.stopPropagation();
-    if (onEdit) onEdit(item);
   };
 
   const handleDelete = (e) => {
@@ -40,7 +33,6 @@ function VaultCard({ item, isCopied, onCopy, onEdit, onDelete }) {
           </span>
         </div>
 
-        {/* Title & Details */}
         <h3 className="font-serif text-lg sm:text-xl text-white mb-1 tracking-tight truncate">
           {item.name}
         </h3>
@@ -80,19 +72,6 @@ function VaultCard({ item, isCopied, onCopy, onEdit, onDelete }) {
                 </motion.span>
               )}
             </AnimatePresence>
-          </button>
-
-          {/* Edit Button */}
-          <button 
-            type="button"
-            onClick={handleEdit}
-            className="p-2.5 sm:p-2 rounded-md hover:bg-[#2a2a2a] text-[#8a8a8a] hover:text-[#c8ff00] transition-colors"
-            title="Edit"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
           </button>
 
           {/* Delete Button */}

@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    
     fullname: {
       type: String,
       required: true,
@@ -15,6 +14,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      index: true,
     },
 
     passwordHash: {
@@ -28,14 +28,15 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-
-    updatedAt: {
-      type: Date,
-      default: Date.now,
+    // 🔐 OTP Verification Fields
+    otp: {
+      code: {
+        type: String,
+        select: false,
+      },
+      expiresAt: {
+        type: Date,
+      },
     },
   },
   {

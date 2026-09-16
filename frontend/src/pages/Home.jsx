@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 
-import useFonts from "../hooks/useFonts.js";
 import { PALETTE } from "../constants/theme.js";
 
 import Grain from "../components/Grain";
@@ -16,8 +15,6 @@ const Pricing = lazy(() => import("./Pricing.jsx"));
 const Footer = lazy(() => import("../pages/Footer"));
 
 function Home() {
-  useFonts();
-
   return (
     <div
       className="min-h-screen text-[#E9E6DD] selection:bg-[#D6FF3F] selection:text-black relative"
