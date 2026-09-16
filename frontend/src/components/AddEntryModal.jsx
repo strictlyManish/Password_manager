@@ -95,7 +95,7 @@ function AddEntryModal({ isOpen, onClose, onSave, categories }) {
                   URL
                 </label>
                 <input
-                  type="text"
+                  type="url"
                   placeholder="e.g., github.com"
                   {...register('url')}
                   className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded px-3 py-2 text-sm text-white placeholder-[#444] focus:border-[#c8ff00] outline-none font-mono"

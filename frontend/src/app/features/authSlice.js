@@ -62,10 +62,6 @@ export const getMe = createAsyncThunk(
   },
 );
 
-// Safe LocalStorage helpers
-// Both "user" and "token" now use the same guard against the literal
-// strings "undefined" / "null", which is what was leaking through as
-// a truthy value and showing up as "undefined" after a refresh.
 const getSavedUser = () => {
   try {
     const item = localStorage.getItem("user");
@@ -131,8 +127,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload?.user || null;
         state.token = action.payload?.token || null;
-        // Derived from what actually came back, instead of a hardcoded
-        // true — avoids "authenticated" state with a null user.
         state.isAuthenticated = !!(action.payload?.user || action.payload?.token);
 
         if (action.payload?.user) {

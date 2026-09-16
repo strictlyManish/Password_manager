@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { PALETTE } from "../constants/theme.js";
+import  {PALETTE } from "../constants/theme.js";
 import  TerminalCard  from "../components/TerminalCard";
 
 function Hero() {
