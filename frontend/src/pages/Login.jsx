@@ -4,12 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser, clearError } from "../app/features/authSlice";
+import { loginSchema } from "../utils/authValidation";
 import Footer from "./Footer";
 
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   const {
     register,
     handleSubmit,
@@ -34,13 +35,23 @@ function Login() {
 
   const onSubmit = async (data) => {
     clearErrors();
-    const result = await dispatch(loginUser(data));
+
+    const parsed = loginSchema.safeParse(data);
+    if (!parsed.success) {
+      const firstIssue = parsed.error.issues[0];
+      setError(firstIssue.path[0] || "root", {
+        type: "validation",
+        message: firstIssue.message,
+      });
+      return;
+    }
+
+    const result = await dispatch(loginUser(parsed.data));
 
     if (loginUser.rejected.match(result)) {
-      const message = result.payload || "Invalid email or password.";
       setError("root.serverError", {
         type: "server",
-        message,
+        message: result.payload || "Invalid email or password.",
       });
     }
   };
@@ -111,11 +122,7 @@ function Login() {
             )}
           </AnimatePresence>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-5"
-            noValidate
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             <div>
               <label className="block text-xs font-mono text-[#8a8a8a] mb-1.5 tracking-wider uppercase">
                 Email
@@ -125,10 +132,6 @@ function Login() {
                 placeholder="jane@company.com"
                 {...register("email", {
                   required: "Need an email to reach you",
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "That doesn't look like a valid email",
-                  },
                   onChange: handleInputChange,
                 })}
                 aria-invalid={Boolean(errors.email || serverErrorMessage)}
@@ -162,10 +165,6 @@ function Login() {
                 placeholder="Enter your master password"
                 {...register("password", {
                   required: "Password is required",
-                  minLength: {
-                    value: 8,
-                    message: "Password must be at least 8 characters",
-                  },
                   onChange: handleInputChange,
                 })}
                 aria-invalid={Boolean(errors.password || serverErrorMessage)}
@@ -188,29 +187,6 @@ function Login() {
                   </motion.p>
                 )}
               </AnimatePresence>
-            </div>
-
-            <div className="flex items-center justify-between pt-2">
-              <div className="flex items-start gap-2.5">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  {...register("remember")}
-                  className="mt-0.5 h-4 w-4 rounded border-[#2a2a2a] bg-[#0a0a0a] text-[#c8ff00] focus:ring-[#c8ff00]/30 cursor-pointer"
-                />
-                <label
-                  htmlFor="remember"
-                  className="text-xs text-[#8a8a8a] leading-relaxed cursor-pointer font-mono"
-                >
-                  Remember me
-                </label>
-              </div>
-              <a
-                href="#"
-                className="text-xs text-[#c8ff00] hover:underline font-mono"
-              >
-                Forgot password?
-              </a>
             </div>
 
             <motion.button

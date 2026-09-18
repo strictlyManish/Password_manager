@@ -5,13 +5,14 @@ const getErrorMessage = (error, fallbackMessage) => {
   if (error.response?.data?.message) {
     return error.response.data.message;
   }
+
   if (!error.response) {
     return "Unable to reach the server. Please try again shortly.";
   }
+
   return fallbackMessage;
 };
 
-// Async Thunks
 export const loginUser = createAsyncThunk(
   "auth/login",
   async (credentials, { rejectWithValue }) => {
@@ -19,9 +20,7 @@ export const loginUser = createAsyncThunk(
       const response = await api.post("/auth/login", credentials);
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        getErrorMessage(error, "Invalid email or password.")
-      );
+      return rejectWithValue(getErrorMessage(error, "Invalid email or password."));
     }
   }
 );
@@ -37,9 +36,7 @@ export const registerUser = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        getErrorMessage(error, "Registration failed. Please try again.")
-      );
+      return rejectWithValue(getErrorMessage(error, "Registration failed. Please try again."));
     }
   }
 );
@@ -51,9 +48,7 @@ export const logoutUser = createAsyncThunk(
       await api.get("/auth/logout");
       return true;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Logout failed"
-      );
+      return rejectWithValue(error.response?.data?.message || "Logout failed.");
     }
   }
 );
@@ -65,9 +60,7 @@ export const getMe = createAsyncThunk(
       const response = await api.get("/auth/me");
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Authentication failed"
-      );
+      return rejectWithValue(error.response?.data?.message || "Authentication failed.");
     }
   }
 );
@@ -83,19 +76,12 @@ const getSavedUser = () => {
   }
 };
 
-const getSavedToken = () => {
-  const item = localStorage.getItem("token");
-  if (!item || item === "undefined" || item === "null") return null;
-  return item;
-};
-
 const savedUser = getSavedUser();
-const savedToken = getSavedToken();
 
 const initialState = {
   user: savedUser,
-  token: savedToken,
-  isAuthenticated: !!(savedUser || savedToken),
+  token: null,
+  isAuthenticated: !!savedUser,
   status: "idle",
   error: null,
   loading: false,
@@ -103,7 +89,6 @@ const initialState = {
 
 const clearStoredAuth = () => {
   localStorage.removeItem("user");
-  localStorage.removeItem("token");
 };
 
 const authSlice = createSlice({
@@ -126,7 +111,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Login cases
       .addCase(loginUser.pending, (state) => {
         state.status = "loading";
         state.loading = true;
@@ -136,14 +120,11 @@ const authSlice = createSlice({
         state.status = "succeeded";
         state.loading = false;
         state.user = action.payload?.user || null;
-        state.token = action.payload?.token || null;
-        state.isAuthenticated = !!(action.payload?.user || action.payload?.token);
+        state.token = null;
+        state.isAuthenticated = !!action.payload?.user;
 
         if (action.payload?.user) {
           localStorage.setItem("user", JSON.stringify(action.payload.user));
-        }
-        if (action.payload?.token) {
-          localStorage.setItem("token", action.payload.token);
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -151,8 +132,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // Register cases
       .addCase(registerUser.pending, (state) => {
         state.status = "loading";
         state.loading = true;
@@ -162,14 +141,11 @@ const authSlice = createSlice({
         state.status = "succeeded";
         state.loading = false;
         state.user = action.payload?.user || null;
-        state.token = action.payload?.token || null;
-        state.isAuthenticated = !!(action.payload?.user || action.payload?.token);
+        state.token = null;
+        state.isAuthenticated = !!action.payload?.user;
 
         if (action.payload?.user) {
           localStorage.setItem("user", JSON.stringify(action.payload.user));
-        }
-        if (action.payload?.token) {
-          localStorage.setItem("token", action.payload.token);
         }
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -177,8 +153,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // Logout cases
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
       })
@@ -199,14 +173,12 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         clearStoredAuth();
       })
-
-      // getMe cases
       .addCase(getMe.pending, (state) => {
         state.loading = true;
       })
       .addCase(getMe.fulfilled, (state, action) => {
         state.loading = false;
-        const user = action.payload?.user || action.payload?.data || null;
+        const user = action.payload?.user || null;
         state.user = user;
         state.isAuthenticated = !!user;
 

@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
 const User = require("../model/user.model");
 
 const COOKIE_NAME = "token";
@@ -8,108 +9,70 @@ const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+  maxAge: 15 * 60 * 1000,
   path: "/",
 };
 
-// =========================
-// REGISTER
-// =========================
+const sanitizeUser = (user) => ({
+  id: user._id,
+  fullname: user.fullname,
+  email: user.email,
+  isEmailVerified: user.isEmailVerified,
+});
+
+const createAuthToken = (userId) =>
+  jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "15m" });
+
 const user_register_controller = async (req, res) => {
   try {
     const { fullname, email, password } = req.body;
-      
-    if (!fullname || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, email and password are required",
-      });
-    }
-
-    if (password.length < 8) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 8 characters",
-      });
-    }
 
     const normalizedEmail = email.toLowerCase().trim();
-
-    const existingUser = await User.findOne({
-      email: normalizedEmail,
-    });
+    const existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: "User already exists",
+        message: "An account with this email already exists.",
       });
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-
     const user = await User.create({
       fullname: fullname.trim(),
       email: normalizedEmail,
       passwordHash,
     });
 
-    const token = jwt.sign(
-      {
-        userId: user._id.toString(),
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      },
-    );
-
+    const token = createAuthToken(user._id.toString());
     res.cookie(COOKIE_NAME, token, cookieOptions);
 
     return res.status(201).json({
       success: true,
-      message: "Registration successful",
-      user: {
-        id: user._id,
-        fullname: user.fullname,
-        email: user.email,
-        isEmailVerified: user.isEmailVerified,
-      },
+      message: "Registration successful.",
+      user: sanitizeUser(user),
     });
   } catch (error) {
     console.error("Register error:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Registration failed. Please try again.",
     });
   }
 };
 
-// =========================
-// LOGIN
-// =========================
 const user_login_controller = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
-    }
-
     const normalizedEmail = email.toLowerCase().trim();
 
-    const user = await User.findOne({
-      email: normalizedEmail,
-    }).select("+passwordHash");
+    const user = await User.findOne({ email: normalizedEmail }).select("+passwordHash");
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid email or password.",
       });
     }
 
@@ -118,45 +81,28 @@ const user_login_controller = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid email or password.",
       });
     }
 
-    const token = jwt.sign(
-      {
-        userId: user._id.toString(),
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      },
-    );
-
+    const token = createAuthToken(user._id.toString());
     res.cookie(COOKIE_NAME, token, cookieOptions);
 
     return res.status(200).json({
       success: true,
-      message: "Login successful",
-      user: {
-        id: user._id,
-        fullname: user.fullname,
-        email: user.email,
-        isEmailVerified: user.isEmailVerified,
-      },
+      message: "Login successful.",
+      user: sanitizeUser(user),
     });
   } catch (error) {
     console.error("Login error:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Login failed. Please try again.",
     });
   }
 };
 
-// =========================
-// LOGOUT
-// =========================
 const user_logout_controller = async (req, res) => {
   try {
     res.clearCookie(COOKIE_NAME, {
@@ -168,14 +114,14 @@ const user_logout_controller = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Logout successful",
+      message: "Logout successful.",
     });
   } catch (error) {
     console.error("Logout error:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Logout failed.",
     });
   }
 };
@@ -185,19 +131,19 @@ const getMe_controller = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: "Not authorized, user not found",
+        message: "Session invalid or expired.",
       });
     }
 
     return res.status(200).json({
       success: true,
-      user: req.user,
+      user: sanitizeUser(req.user),
     });
   } catch (error) {
     console.error("getMe error:", error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Unable to fetch user.",
     });
   }
 };
