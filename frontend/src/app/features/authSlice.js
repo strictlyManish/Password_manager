@@ -1,6 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/axios";
 
+const getErrorMessage = (error, fallbackMessage) => {
+  if (error.response?.data?.message) {
+    return error.response.data.message;
+  }
+  if (!error.response) {
+    return "Unable to reach the server. Please try again shortly.";
+  }
+  return fallbackMessage;
+};
+
 // Async Thunks
 export const loginUser = createAsyncThunk(
   "auth/login",
@@ -10,10 +20,10 @@ export const loginUser = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Login failed",
+        getErrorMessage(error, "Invalid email or password.")
       );
     }
-  },
+  }
 );
 
 export const registerUser = createAsyncThunk(
@@ -28,10 +38,10 @@ export const registerUser = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Registration failed",
+        getErrorMessage(error, "Registration failed. Please try again.")
       );
     }
-  },
+  }
 );
 
 export const logoutUser = createAsyncThunk(
@@ -42,10 +52,10 @@ export const logoutUser = createAsyncThunk(
       return true;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Logout failed",
+        error.response?.data?.message || "Logout failed"
       );
     }
-  },
+  }
 );
 
 export const getMe = createAsyncThunk(
@@ -56,10 +66,10 @@ export const getMe = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Authentication failed",
+        error.response?.data?.message || "Authentication failed"
       );
     }
-  },
+  }
 );
 
 const getSavedUser = () => {
@@ -67,7 +77,7 @@ const getSavedUser = () => {
     const item = localStorage.getItem("user");
     if (!item || item === "undefined" || item === "null") return null;
     return JSON.parse(item);
-  } catch (error) {
+  } catch {
     localStorage.removeItem("user");
     return null;
   }
@@ -86,9 +96,9 @@ const initialState = {
   user: savedUser,
   token: savedToken,
   isAuthenticated: !!(savedUser || savedToken),
-  status: "loading",
+  status: "idle",
   error: null,
-  loading: true,
+  loading: false,
 };
 
 const clearStoredAuth = () => {
@@ -198,7 +208,6 @@ const authSlice = createSlice({
         state.loading = false;
         const user = action.payload?.user || action.payload?.data || null;
         state.user = user;
-        state.token = state.token || null;
         state.isAuthenticated = !!user;
 
         if (user) {

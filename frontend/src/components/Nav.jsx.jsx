@@ -41,8 +41,8 @@ function Nav() {
           borderBottom: scrolled ? `1px solid ${PALETTE.line}` : "1px solid transparent",
         }}
       >
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-          <a href="#" className="font-display text-xl tracking-tight" style={{ color: PALETTE.ink }}>
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between cursor-pointer">
+          <a href="/" className="font-display text-xl tracking-tight cursor-pointer" style={{ color: PALETTE.ink }}>
             Credentials<span style={{ color: PALETTE.lime }}>®</span>
           </a>
 

@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
-
+import {useNavigate} from "react-router-dom"
 function VaultCard({ item, isCopied, onCopy, onEdit, onDelete }) {
   const itemId = item._id || item.id;
-
+  const navigate = useNavigate()
   const handleCopy = (e) => {
     e.stopPropagation();
     if (onCopy) onCopy(itemId);
@@ -13,8 +13,11 @@ function VaultCard({ item, isCopied, onCopy, onEdit, onDelete }) {
     if (onDelete) onDelete(itemId);
   };
 
+  
+
   return (
     <motion.div
+      onClick={()=>navigate(`${itemId}`)}
       layout
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}

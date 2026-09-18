@@ -9,23 +9,23 @@ import Footer from "./Footer";
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
   const {
     register,
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm();
+    clearErrors,
+  } = useForm({ mode: "onSubmit" });
 
   const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
 
-  // Redirect to dashboard if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
 
-  // Clear error when component unmounts
   useEffect(() => {
     return () => {
       dispatch(clearError());
@@ -33,19 +33,31 @@ function Login() {
   }, [dispatch]);
 
   const onSubmit = async (data) => {
+    clearErrors();
     const result = await dispatch(loginUser(data));
-    
-    // Handle login failure
+
     if (loginUser.rejected.match(result)) {
-      setError("root", {
-        message: result.payload || "Login failed. Please check your credentials.",
+      const message = result.payload || "Invalid email or password.";
+      setError("root.serverError", {
+        type: "server",
+        message,
       });
     }
   };
 
+  const handleInputChange = () => {
+    if (errors.root?.serverError) {
+      clearErrors("root.serverError");
+    }
+    if (error) {
+      dispatch(clearError());
+    }
+  };
+
+  const serverErrorMessage = errors.root?.serverError?.message || error;
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col relative overflow-hidden">
-      {/* Background Grid */}
       <div
         className="absolute inset-0 opacity-30 z-0"
         style={{
@@ -55,7 +67,6 @@ function Login() {
         }}
       />
 
-      {/* Main Content Area */}
       <main className="flex-1 flex items-center justify-center px-4 py-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -80,17 +91,21 @@ function Login() {
             </p>
           </div>
 
-          {/* Error Message */}
-          <AnimatePresence>
-            {(error || errors.root) && (
+          <AnimatePresence mode="wait">
+            {serverErrorMessage && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
+                role="alert"
+                aria-live="polite"
                 className="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-lg"
               >
+                <p className="text-red-300 text-xs font-mono font-semibold mb-1">
+                  Authentication Failed
+                </p>
                 <p className="text-red-400 text-xs font-mono">
-                  {error || errors.root?.message}
+                  {serverErrorMessage}
                 </p>
               </motion.div>
             )}
@@ -112,11 +127,13 @@ function Login() {
                   required: "Need an email to reach you",
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "That doesn't look right",
+                    message: "That doesn't look like a valid email",
                   },
+                  onChange: handleInputChange,
                 })}
+                aria-invalid={Boolean(errors.email || serverErrorMessage)}
                 className={`w-full px-4 py-2.5 bg-[#0a0a0a] border text-sm text-white placeholder-[#555] outline-none transition-all duration-200 focus:ring-1 font-mono ${
-                  errors.email
+                  errors.email || serverErrorMessage
                     ? "border-red-500/50 focus:ring-red-500/30"
                     : "border-[#2a2a2a] focus:border-[#c8ff00] focus:ring-[#c8ff00]/20"
                 }`}
@@ -144,14 +161,16 @@ function Login() {
                 type="password"
                 placeholder="Enter your master password"
                 {...register("password", {
-                  required: "Gotta have a password",
+                  required: "Password is required",
                   minLength: {
                     value: 8,
-                    message: "Make it at least 8 chars",
+                    message: "Password must be at least 8 characters",
                   },
+                  onChange: handleInputChange,
                 })}
+                aria-invalid={Boolean(errors.password || serverErrorMessage)}
                 className={`w-full px-4 py-2.5 bg-[#0a0a0a] border text-sm text-white placeholder-[#555] outline-none transition-all duration-200 focus:ring-1 font-mono ${
-                  errors.password
+                  errors.password || serverErrorMessage
                     ? "border-red-500/50 focus:ring-red-500/30"
                     : "border-[#2a2a2a] focus:border-[#c8ff00] focus:ring-[#c8ff00]/20"
                 }`}

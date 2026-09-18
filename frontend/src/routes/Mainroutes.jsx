@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import PublicOnlyRoute from "../components/PublicOnlyRoute";
+import Edit from "../pages/Edit";
 
 const Home = lazy(() => import("../pages/Home"));
 const Register = lazy(() => import("../pages/Register"));
@@ -34,6 +35,7 @@ function Mainroutes() {
         {/* Protected */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/:id" element={<Edit />} />
         </Route>
 
         {/* 404 */}

@@ -16,6 +16,7 @@ function Register() {
     formState: { errors, isSubmitting },
     watch,
     setError,
+    clearErrors,
   } = useForm();
   const { loading, error, isAuthenticated } = useSelector(
     (state) => state.auth,
@@ -35,6 +36,7 @@ function Register() {
   }, [dispatch]);
 
   const onSubmit = async (data) => {
+    clearErrors("root");
     const result = await dispatch(registerUser(data));
 
     // Handle register failure
@@ -117,6 +119,21 @@ function Register() {
               Takes about a minute. No credit card.
             </p>
           </div>
+
+          <AnimatePresence>
+            {(error || errors.root) && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-lg"
+              >
+                <p className="text-red-400 text-xs font-mono">
+                  {error || errors.root?.message}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <form
             onSubmit={handleSubmit(onSubmit)}
