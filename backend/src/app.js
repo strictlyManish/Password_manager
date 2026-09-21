@@ -31,7 +31,14 @@ const sanitizeInput = (value) => {
 };
 
 const app = express();
-const baseOrigin = process.env.FRONTEND_URL || "https://cr-umber-xi.vercel.app/";
+
+// Sanitize allowed origins and remove trailing slashes (Browsers omit trailing slashes in Origin headers)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://cr-umber-xi.vercel.app",
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL.replace(/\/$/, "")] : []),
+];
 
 app.disable("x-powered-by");
 app.use(
@@ -40,16 +47,29 @@ app.use(
     contentSecurityPolicy: false,
   })
 );
+
 app.use(
   cors({
-    origin: baseOrigin,
+    origin: (origin, callback) => {
+      // Allow server-to-server requests or tool calls with no origin header
+      if (!origin) return callback(null, true);
+
+      const cleanOrigin = origin.replace(/\/$/, "");
+      if (allowedOrigins.includes(cleanOrigin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS policy blocked request from origin: ${origin}`));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
   })
 );
+
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
+
 app.use((req, _res, next) => {
   if (req.body) {
     req.body = sanitizeInput(req.body);
@@ -77,8 +97,8 @@ app.get("/auth/csrf", csrfProtection, (req, res) => {
 app.use("/auth", user_route);
 app.use("/vault", vault_route);
 
-app.get('/api', (req, res) => {
-  res.json({ message: 'Backend connected successfully!' });
+app.get("/api", (req, res) => {
+  res.json({ message: "Backend connected successfully!" });
 });
 
 app.use((err, req, res, next) => {
