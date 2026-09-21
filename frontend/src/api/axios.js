@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
+  baseURL: import.meta.env.VITE_API_URL || "https://password-manager-mu-ashen.vercel.app/",
   headers: {
     "Content-Type": "application/json",
   },
@@ -11,7 +11,7 @@ const api = axios.create({
 let csrfToken = "";
 
 const fetchCsrfToken = async () => {
-  const response = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/auth/csrf`, {
+  const response = await axios.get(`${import.meta.env.VITE_API_URL || "https://password-manager-mu-ashen.vercel.app/"}/auth/csrf`, {
     withCredentials: true,
   });
 
