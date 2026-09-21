@@ -19,8 +19,4 @@ const startServer = async () => {
   }
 };
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'online' });
-});
-
 startServer();

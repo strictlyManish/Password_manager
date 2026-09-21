@@ -77,6 +77,10 @@ app.get("/auth/csrf", csrfProtection, (req, res) => {
 app.use("/auth", user_route);
 app.use("/vault", vault_route);
 
+app.get('/api', (req, res) => {
+  res.json({ message: 'Backend connected successfully!' });
+});
+
 app.use((err, req, res, next) => {
   if (err.code === "EBADCSRFTOKEN") {
     return res.status(403).json({
