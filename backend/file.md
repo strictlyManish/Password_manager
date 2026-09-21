@@ -302,7 +302,7 @@ const app = express();
 
 // Core middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // your frontend URL
+  origin: 'https://cr-umber-xi.vercel.app/', // your frontend URL
   credentials: true,
 }));
 app.use(express.json());

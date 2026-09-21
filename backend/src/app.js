@@ -31,7 +31,7 @@ const sanitizeInput = (value) => {
 };
 
 const app = express();
-const baseOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+const baseOrigin = process.env.FRONTEND_URL || "https://cr-umber-xi.vercel.app/";
 
 app.disable("x-powered-by");
 app.use(
