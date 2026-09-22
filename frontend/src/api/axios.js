@@ -3,7 +3,7 @@ import axios from "axios";
 const normalizeBaseUrl = (value = "") => value.replace(/\/+$/, "");
 
 const API_BASE_URL = normalizeBaseUrl(
-  import.meta.env.VITE_API_URL || "https://password-manager-rose-five.vercel.app/api"
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
 );
 
 const api = axios.create({

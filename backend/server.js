@@ -8,11 +8,13 @@ const startServer = async () => {
     if (!process.env.JWT_SECRET || !process.env.MONGODB_URI) {
       throw new Error("Missing required env vars. Check backend/.env.example for required keys.");
     }
-
+    console.log('-----')
     await connect_DB();
     app.listen(process.env.PORT || 3000, () => {
       console.log("Server running smoothly on port", process.env.PORT || 3000);
+      console.log('-----')
     });
+    
   } catch (error) {
     console.error("Server startup failed:", error.message);
     process.exit(1);

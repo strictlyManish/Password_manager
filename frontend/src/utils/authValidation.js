@@ -35,7 +35,7 @@ export const registerSchema = z.object({
   password: z
     .string()
     .trim()
-    .min(12, "Password must be at least 12 characters.")
+    .min(8, "Password must be at least 8 characters.")
     .max(128, "Password is too long.")
     .refine(
       (value) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/.test(value),

@@ -4,7 +4,7 @@ const mongoose  = require("mongoose");
 async function connect_DB() {
     try {
         await mongoose.connect(process.env.MONGODB_URI);
-        console.log('database connection smoothly..')
+        console.log('database connected - ✅')
     } catch (error) {
         console.log('database connection faild..')
     }

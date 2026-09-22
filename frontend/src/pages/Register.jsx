@@ -117,7 +117,7 @@ function Register() {
               </label>
               <input
                 type="text"
-                placeholder="Jane Doe"
+                placeholder="Man_01"
                 {...register("fullname", {
                   required: "We'll need your name",
                 })}
@@ -180,7 +180,7 @@ function Register() {
                 </label>
                 <input
                   type="password"
-                  placeholder="At least 12 chars"
+                  placeholder="At least 8 chars"
                   {...register("password", {
                     required: "Password is required",
                   })}
