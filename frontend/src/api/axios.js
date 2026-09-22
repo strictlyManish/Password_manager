@@ -1,7 +1,13 @@
 import axios from "axios";
 
+const normalizeBaseUrl = (value = "") => value.replace(/\/+$/, "");
+
+const API_BASE_URL = normalizeBaseUrl(
+  import.meta.env.VITE_API_URL || "https://password-manager-mu-ashen.vercel.app"
+);
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://password-manager-mu-ashen.vercel.app/",
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -11,7 +17,7 @@ const api = axios.create({
 let csrfToken = "";
 
 const fetchCsrfToken = async () => {
-  const response = await axios.get(`${import.meta.env.VITE_API_URL || "https://password-manager-mu-ashen.vercel.app/"}/auth/csrf`, {
+  const response = await axios.get(`${API_BASE_URL}/auth/csrf`, {
     withCredentials: true,
   });
 
