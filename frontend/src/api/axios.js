@@ -3,7 +3,7 @@ import axios from "axios";
 const normalizeBaseUrl = (value = "") => value.replace(/\/+$/, "");
 
 const API_BASE_URL = normalizeBaseUrl(
-  import.meta.env.VITE_API_URL || "https://password-manager-mu-ashen.vercel.app"
+  import.meta.env.VITE_API_URL || "https://password-manager-rose-five.vercel.app/"
 );
 
 const api = axios.create({
@@ -16,13 +16,26 @@ const api = axios.create({
 
 let csrfToken = "";
 
-const fetchCsrfToken = async () => {
-  const response = await axios.get(`${API_BASE_URL}/auth/csrf`, {
-    withCredentials: true,
-  });
 
-  csrfToken = response.data.csrfToken;
-  return csrfToken;
+const fetchCsrfToken = async () => {
+  try {
+    // Make sure path matches your backend route (e.g., /auth/csrf or /csrf)
+    const response = await axios.get(`${API_BASE_URL}/auth/csrf`, {
+      withCredentials: true,
+    });
+
+    csrfToken =
+      response.data?.csrfToken ||
+      response.data?.token ||
+      response.headers["x-csrf-token"] ||
+      "";
+
+    return csrfToken;
+  } catch (error) {
+    console.error("Failed to fetch CSRF token:", error);
+    csrfToken = "";
+    throw error;
+  }
 };
 
 api.interceptors.request.use(
@@ -31,10 +44,12 @@ api.interceptors.request.use(
 
     if (!["get", "head", "options"].includes(method)) {
       if (!csrfToken) {
-        csrfToken = await fetchCsrfToken();
+        await fetchCsrfToken();
       }
 
-      config.headers["X-CSRF-Token"] = csrfToken;
+      if (csrfToken) {
+        config.headers["x-csrf-token"] = csrfToken;
+      }
     }
 
     return config;
@@ -44,8 +59,20 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 403 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      csrfToken = "";
+      await fetchCsrfToken();
+      if (csrfToken) {
+        originalRequest.headers["x-csrf-token"] = csrfToken;
+        return api(originalRequest);
+      }
+    }
+
+    if (error.response?.status === 401) {
       localStorage.removeItem("user");
     }
 

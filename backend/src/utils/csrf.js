@@ -2,22 +2,31 @@ const crypto = require("crypto");
 
 const CSRF_COOKIE_NAME = "_csrf";
 const CSRF_HEADER_NAME = "x-csrf-token";
-const CSRF_SECRET = process.env.CSRF_SECRET || process.env.JWT_SECRET || "dev-csrf-secret-change-me";
 
-const createTokenSignature = (token) =>
-  crypto.createHmac("sha256", CSRF_SECRET).update(token).digest("hex");
+const timingSafeCompare = (a, b) => {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+};
+
 
 const issueCsrfToken = (req, res) => {
-  const token = crypto.randomBytes(32).toString("hex");
-  const signedToken = `${token}.${createTokenSignature(token)}`;
+  let token = req.cookies?.[CSRF_COOKIE_NAME];
 
-  res.cookie(CSRF_COOKIE_NAME, signedToken, {
-    httpOnly: true,
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 15 * 60 * 1000,
-  });
+  if (!token) {
+    token = crypto.randomBytes(32).toString("hex");
+
+    res.cookie(CSRF_COOKIE_NAME, token, {
+      httpOnly: false,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 15 * 60 * 1000,
+    });
+  }
 
   req.csrfToken = () => token;
   return token;
@@ -31,35 +40,10 @@ const csrfProtection = (req, res, next) => {
     return next();
   }
 
-  const cookieValue = req.cookies?.[CSRF_COOKIE_NAME];
-  const headerValue = req.headers[CSRF_HEADER_NAME];
+  const cookieToken = req.cookies?.[CSRF_COOKIE_NAME];
+  const headerToken = req.headers[CSRF_HEADER_NAME];
 
-  if (!cookieValue || !headerValue) {
-    return res.status(403).json({
-      success: false,
-      message: "CSRF validation failed. Please refresh and try again.",
-    });
-  }
-
-  const [cookieToken, cookieSignature] = String(cookieValue).split(".");
-  const headerToken = String(headerValue).trim();
-
-  if (!cookieToken || !headerToken || !cookieSignature) {
-    return res.status(403).json({
-      success: false,
-      message: "CSRF validation failed. Please refresh and try again.",
-    });
-  }
-
-  const expectedCookieSignature = createTokenSignature(cookieToken);
-  const cookieMatches =
-    cookieToken === headerToken &&
-    crypto.timingSafeEqual(
-      Buffer.from(cookieSignature),
-      Buffer.from(expectedCookieSignature)
-    );
-
-  if (!cookieMatches) {
+  if (!cookieToken || !headerToken || !timingSafeCompare(cookieToken, headerToken)) {
     return res.status(403).json({
       success: false,
       message: "CSRF validation failed. Please refresh and try again.",
@@ -69,4 +53,9 @@ const csrfProtection = (req, res, next) => {
   return next();
 };
 
-module.exports = { csrfProtection, issueCsrfToken, CSRF_COOKIE_NAME, CSRF_HEADER_NAME };
+module.exports = {
+  csrfProtection,
+  issueCsrfToken,
+  CSRF_COOKIE_NAME,
+  CSRF_HEADER_NAME,
+};
