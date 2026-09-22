@@ -113,7 +113,7 @@ function Register() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             <div>
               <label className="block text-xs font-mono text-[#8a8a8a] mb-1.5 tracking-wider uppercase">
-                Full name
+                username
               </label>
               <input
                 type="text"
