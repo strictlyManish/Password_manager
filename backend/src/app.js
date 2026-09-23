@@ -36,6 +36,8 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
+  "https://credentials-umber.vercel.app/",
+  "https://password-manager-hazel-six.vercel.app/",
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL.replace(/\/$/, "")] : []),
 ];
 
